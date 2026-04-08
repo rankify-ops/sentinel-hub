@@ -540,6 +540,24 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
 
   <div class="card" style="margin-top:14px;">
     <div class="card-header">
+      <div class="card-title">Loan to Dom</div>
+      <span class="card-badge badge-purple">Personal</span>
+    </div>
+    <div class="finance-row"><span class="label">Original Amount</span><span class="value">—</span></div>
+    <div class="finance-row"><span class="label">Amount Remaining</span><span class="value amber" id="p-loan-remaining">$9,045.00</span></div>
+    <div class="progress-bar" style="margin:12px 0 8px;"><div class="progress-fill amber" id="p-loan-bar" style="width:100%;"></div></div>
+    <div style="font-size:0.7rem;color:var(--text-faint);margin-bottom:14px;" id="p-loan-status">Log repayments below to track progress</div>
+    <div class="todo-input-row" style="flex-wrap:wrap;">
+      <input type="number" step="0.01" class="todo-input" id="p-loan-amt" placeholder="Repayment $" style="max-width:130px;">
+      <input type="date" class="todo-input" id="p-loan-date" style="max-width:150px;">
+      <input type="text" class="todo-input" id="p-loan-note" placeholder="Note (optional)" style="flex:1;min-width:120px;">
+      <button class="todo-btn" onclick="addLoanRepayment()">Log Repayment</button>
+    </div>
+    <div id="p-loan-log" class="status-list" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-header">
       <div class="card-title">Expense Log</div>
       <span class="card-badge badge-amber">Track</span>
     </div>
@@ -636,6 +654,8 @@ function defaultState() {
     waterToday: 0,
     waterDate: today(),
     propertyExpenses: [],
+    loanRepayments: [],
+    loanOriginal: 9045,
     expenses: [],
     dailyStreak: 0,
     lastStreakDate: null
@@ -953,6 +973,55 @@ function renderPropertyExpenses() {
   }
 }
 
+// ─── LOAN TO DOM ───
+function addLoanRepayment() {
+  const amt = parseFloat(document.getElementById('p-loan-amt').value);
+  const date = document.getElementById('p-loan-date').value || today();
+  const note = document.getElementById('p-loan-note').value.trim();
+  if (!amt) return;
+  state.loanRepayments = state.loanRepayments || [];
+  state.loanRepayments.push({ id: uid(), amt, date, note });
+  document.getElementById('p-loan-amt').value = '';
+  document.getElementById('p-loan-note').value = '';
+  saveState();
+  renderLoan();
+}
+
+function renderLoan() {
+  state.loanRepayments = state.loanRepayments || [];
+  const totalRepaid = state.loanRepayments.reduce((s, r) => s + r.amt, 0);
+  const original = state.loanOriginal || 9045;
+  const remaining = Math.max(0, original - totalRepaid);
+  const pctRemaining = (remaining / original) * 100;
+
+  document.getElementById('p-loan-remaining').textContent = '$' + remaining.toFixed(2);
+  document.getElementById('p-loan-bar').style.width = pctRemaining + '%';
+
+  if (remaining <= 0) {
+    document.getElementById('p-loan-remaining').className = 'value green';
+    document.getElementById('p-loan-remaining').textContent = 'PAID OFF';
+    document.getElementById('p-loan-bar').className = 'progress-fill green';
+    document.getElementById('p-loan-status').textContent = 'Fully repaid — $' + totalRepaid.toFixed(2) + ' total';
+  } else {
+    document.getElementById('p-loan-status').textContent = '$' + totalRepaid.toFixed(2) + ' repaid · $' + remaining.toFixed(2) + ' remaining';
+  }
+
+  const container = document.getElementById('p-loan-log');
+  const sorted = [...state.loanRepayments].sort((a, b) => b.date.localeCompare(a.date));
+  if (sorted.length === 0) {
+    container.innerHTML = '';
+  } else {
+    container.innerHTML = sorted.map(r => `
+      <div class="status-item">
+        <div class="status-dot green"></div>
+        <span class="status-text">Repayment${r.note ? ' · ' + esc(r.note) : ''}</span>
+        <span class="status-meta" style="color:var(--green);">$${r.amt.toFixed(2)}</span>
+        <span class="status-meta">${r.date}</span>
+      </div>
+    `).join('');
+  }
+}
+
 // ─── GENERAL EXPENSES ───
 function addExpense() {
   const desc = document.getElementById('f-exp-desc').value.trim();
@@ -1066,6 +1135,7 @@ renderTodos();
 renderGoals();
 renderHealth();
 renderPropertyExpenses();
+renderLoan();
 renderExpenses();
 updateOverview();
 </script>
