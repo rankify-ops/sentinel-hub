@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SENTINEL — Personal Ops</title>
+<title>Personal Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -216,8 +216,8 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
 <!-- ─── SIDEBAR ─── -->
 <aside class="sidebar">
   <div class="sidebar-brand">
-    <h1>SENTINEL</h1>
-    <div class="subtitle">Personal Operations</div>
+    <h1>Dashboard</h1>
+    <div class="subtitle">Thomas Flood</div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-item active" data-tab="overview"><span class="nav-icon">◉</span> Overview</div>
@@ -228,7 +228,7 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
     <div class="nav-item" data-tab="finance"><span class="nav-icon">$</span> Finance</div>
   </nav>
   <div class="sidebar-footer">
-    <div class="domain">sentinel-hub</div>
+    <div class="domain">personal</div>
     <div style="margin-top:4px;">Thomas Flood</div>
   </div>
 </aside>
@@ -630,7 +630,7 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
   <!-- VICOM RECURRING -->
   <div class="card" style="margin-bottom:14px;">
     <div class="card-header">
-      <div class="card-title">Vicom (SIGNAL) Recurring Costs</div>
+      <div class="card-title">Vicom Recurring Costs</div>
       <span class="card-badge badge-amber">12 active</span>
     </div>
     <table class="data-table">
@@ -655,7 +655,7 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
   <!-- RANKIFY RECURRING -->
   <div class="card" style="margin-bottom:14px;">
     <div class="card-header">
-      <div class="card-title">Rankify (CRAWLER) Recurring Costs</div>
+      <div class="card-title">Rankify Recurring Costs</div>
       <span class="card-badge badge-blue">16 items</span>
     </div>
     <table class="data-table">
@@ -684,7 +684,7 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
   <!-- HIATUS RECURRING -->
   <div class="card" style="margin-bottom:14px;">
     <div class="card-header">
-      <div class="card-title">Hiatus Collection (LUXE) Recurring Costs</div>
+      <div class="card-title">Hiatus Collection Recurring Costs</div>
       <span class="card-badge badge-purple">5 active</span>
     </div>
     <table class="data-table">
@@ -732,7 +732,7 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
 
 <script>
 // ─── STATE (localStorage persistence) ───
-const STATE_KEY = 'sentinel_hub_state';
+const STATE_KEY = 'personal_dashboard_state';
 let state = loadState();
 
 function defaultState() {
