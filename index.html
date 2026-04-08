@@ -575,40 +575,131 @@ body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidde
 <div class="tab-panel" id="tab-finance">
   <div class="section-header">
     <h2>Finance</h2>
-    <div class="updated">Income, subscriptions & cash flow overview</div>
+    <div class="updated">Recurring costs from ClickUp · All 4 workspaces</div>
   </div>
 
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Income Streams</div>
-        <span class="card-badge badge-green">Monthly</span>
-      </div>
-      <div class="finance-row"><span class="label">Vicom Salary</span><span class="value green">—</span></div>
-      <div class="finance-row"><span class="label">Rental Income (net)</span><span class="value green">$3,023</span></div>
-      <div class="finance-row"><span class="label">Rankify Clients</span><span class="value green">—</span></div>
-      <div class="finance-row"><span class="label">Hiatus Sales</span><span class="value green">—</span></div>
-      <hr class="section-divider" style="margin:8px 0;">
-      <div class="finance-row"><span class="label" style="font-weight:600;">Total Monthly</span><span class="value teal" id="f-total-income">—</span></div>
+  <div class="metrics-grid">
+    <div class="card metric-tile">
+      <div class="metric-value red">$3,178</div>
+      <div class="metric-label">Personal /mo</div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Active Subscriptions</div>
-        <span class="card-badge badge-amber">Recurring</span>
-      </div>
-      <table class="data-table">
-        <thead><tr><th>Service</th><th>Cost</th><th>Billed To</th></tr></thead>
-        <tbody>
-          <tr><td>Claude.ai</td><td style="color:var(--amber)">—</td><td style="font-size:0.7rem;">Vicom reimburse</td></tr>
-          <tr><td>Buffer</td><td style="color:var(--amber)">—</td><td style="font-size:0.7rem;">Vicom reimburse</td></tr>
-          <tr><td>Smartlead</td><td style="color:var(--amber)">$39/mo</td><td style="font-size:0.7rem;">Rankify</td></tr>
-          <tr><td>Shopify</td><td style="color:var(--amber)">—</td><td style="font-size:0.7rem;">Hiatus</td></tr>
-          <tr><td>Semrush</td><td style="color:var(--red-soft)">Review</td><td style="font-size:0.7rem;">Axe if no clients</td></tr>
-        </tbody>
-      </table>
+    <div class="card metric-tile">
+      <div class="metric-value amber" id="f-vicom-total">—</div>
+      <div class="metric-label">Vicom /mo</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value blue" id="f-rankify-total">—</div>
+      <div class="metric-label">Rankify /mo</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value purple" id="f-hiatus-total">—</div>
+      <div class="metric-label">Hiatus /mo</div>
     </div>
   </div>
 
+  <!-- PERSONAL RECURRING -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-title">Personal Recurring Costs</div>
+      <span class="card-badge badge-red">$3,177.88/mo</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Service</th><th>Monthly</th><th>Annual</th><th>Cycle</th></tr></thead>
+      <tbody>
+        <tr><td>Investment Property 33/286</td><td style="color:var(--red-soft)">$1,313.75</td><td>$15,765.00</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Rent 6/286 Espl</td><td style="color:var(--red-soft)">$620.00</td><td>$7,440.00</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Car Finance</td><td style="color:var(--red-soft)">$566.42</td><td>$6,797.04</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Money → Rankify Account</td><td style="color:var(--red-soft)">$479.00</td><td>$5,748.00</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Kayo</td><td style="color:var(--amber)">$311.88</td><td>$25.99</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>AHM Health Insurance</td><td style="color:var(--red-soft)">$159.23</td><td>$1,910.76</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>P3 Membership</td><td style="color:var(--red-soft)">$153.96</td><td>$1,847.52</td><td style="font-size:0.68rem;">Weekly</td></tr>
+        <tr><td>Car Insurance</td><td style="color:var(--amber)">$125.87</td><td>$1,510.44</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Vodafone Plan</td><td style="color:var(--amber)">$81.51</td><td>$978.12</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Snapfitness Gym</td><td style="color:var(--amber)">$78.30</td><td>$939.60</td><td style="font-size:0.68rem;">Fortnightly</td></tr>
+        <tr><td>Car Registration</td><td style="color:var(--amber)">$72.76</td><td>$873.20</td><td style="font-size:0.68rem;">6 Monthly</td></tr>
+        <tr><td>Internet</td><td style="color:var(--amber)">$35.00</td><td>$420.00</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Express VPN</td><td style="color:var(--amber)">$21.99</td><td>$263.88</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>YouTube Premium</td><td style="color:var(--amber)">$16.99</td><td>$203.88</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>iCloud Storage</td><td style="color:var(--amber)">$14.99</td><td>$179.88</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Amazon Prime</td><td style="color:var(--amber)">$11.99</td><td>$143.88</td><td style="font-size:0.68rem;">Monthly</td></tr>
+        <tr><td>Spotify</td><td style="color:var(--amber)">$7.99</td><td>$95.88</td><td style="font-size:0.68rem;">Monthly</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- VICOM RECURRING -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-title">Vicom (SIGNAL) Recurring Costs</div>
+      <span class="card-badge badge-amber">12 active</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Service</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Buffer</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);">Vicom reimburse</td></tr>
+        <tr><td>Zapier PRO</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);"></td></tr>
+        <tr><td>Sucuri</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);">WAF/CDN</td></tr>
+        <tr><td>Claude AI</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);">Vicom reimburse</td></tr>
+        <tr><td>Website Hosting NZ</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);">VentraIP</td></tr>
+        <tr><td>Website Hosting AUS</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);">VentraIP</td></tr>
+        <tr><td>Cognito Forms</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);"></td></tr>
+        <tr><td>Canva Pro</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);"></td></tr>
+        <tr><td>ClickUp Pro</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);"></td></tr>
+        <tr><td>Stripo</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);">Email templates</td></tr>
+        <tr><td>LinkedIn Premium</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);"></td></tr>
+        <tr><td>Google One Drive</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td><td style="font-size:0.68rem;color:var(--text-faint);"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RANKIFY RECURRING -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-title">Rankify (CRAWLER) Recurring Costs</div>
+      <span class="card-badge badge-blue">16 items</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Service</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Smartlead</td><td><span class="card-badge badge-purple" style="font-size:0.55rem;">coldflows</span></td></tr>
+        <tr><td>Porkbun Domains (rankify.au & .studio)</td><td><span class="card-badge badge-purple" style="font-size:0.55rem;">coldflows</span></td></tr>
+        <tr><td>Domain: rankfy.ai (Spaceship)</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Domain: rankfy.io (Spaceship)</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Zapier</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Automattic</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>GoDaddy Email (tflood@rankify.com.au)</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Business 1300 Number</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>GoDaddy Domain: rankify.com.au</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Checkout Page</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Framer (all clients)</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>ClickUp Pro</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td style="color:var(--text-faint)">Semrush</td><td><span class="card-badge badge-amber" style="font-size:0.55rem;">paused</span></td></tr>
+        <tr><td style="color:var(--text-faint)">Hostinger VPS</td><td><span class="card-badge badge-amber" style="font-size:0.55rem;">paused</span></td></tr>
+        <tr><td style="color:var(--text-faint)">CapCut</td><td><span class="card-badge badge-amber" style="font-size:0.55rem;">paused</span></td></tr>
+        <tr><td style="color:var(--text-faint)">Motion Array</td><td><span class="card-badge badge-amber" style="font-size:0.55rem;">paused</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- HIATUS RECURRING -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-title">Hiatus Collection (LUXE) Recurring Costs</div>
+      <span class="card-badge badge-purple">5 active</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Service</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Shopify Subscription</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>XERO</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Domain: hiatuscollection.com.au</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Domain: hiatuscollection.com</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+        <tr><td>Business Email & Microsoft 365</td><td><span class="card-badge badge-teal" style="font-size:0.55rem;">active</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EXPENSE TRACKER -->
   <div class="card" style="margin-top:14px;">
     <div class="card-header">
       <div class="card-title">Expense Tracker</div>
