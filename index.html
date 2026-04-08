@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SENTINEL — Personal Ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #fff;
+  --text: #e8e8e8;
+  --text-secondary: #ccc;
+  --text-muted: #999;
+  --text-faint: #777;
+  --white: #fff;
+  --teal: #2dd4a8;
+  --teal-bright: #34eabd;
+  --teal-glow: rgba(45,212,168,0.15);
+  --teal-subtle: rgba(45,212,168,0.07);
+  --red-soft: #ef6b6b;
+  --amber: #f0a840;
+  --green: #34d399;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-bg-heavy: rgba(255,255,255,0.12);
+  --glass-border: rgba(255,255,255,0.12);
+  --glass-border-subtle: rgba(255,255,255,0.08);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  --glass-blur: 30px;
+  --sidebar-bg: rgba(255,255,255,0.06);
+  --font: 'Inter', -apple-system, sans-serif;
+  --sidebar-w: 256px;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;overflow-x:hidden}
+body{font-family:var(--font);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;background:#0a0a0a;max-width:100vw}
+.bg-layer{position:fixed;inset:0;z-index:0;background:url('bg.jpg') center center/cover no-repeat}
+.bg-layer::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.5)}
+.app{display:flex;min-height:100vh;position:relative;z-index:2}
+
+/* ─── Sidebar ─── */
+.sidebar{width:var(--sidebar-w);min-height:100vh;position:fixed;left:0;top:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(40px) saturate(1.4);-webkit-backdrop-filter:blur(40px) saturate(1.4);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;z-index:100;transition:transform var(--transition);box-shadow:4px 0 30px rgba(0,0,0,0.15)}
+.sidebar-brand{padding:28px 22px 22px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.sidebar-brand h1{font-family:var(--font);font-size:1.3rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;line-height:1.2}
+.sidebar-brand .subtitle{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:5px;font-weight:500}
+.sidebar-nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition);font-size:0.84rem;font-weight:400;color:rgba(255,255,255,0.55);border:1px solid transparent;user-select:none}
+.nav-item:hover{background:rgba(45,212,168,0.06);color:var(--white)}
+.nav-item.active{background:rgba(45,212,168,0.1);color:var(--teal);border-color:rgba(45,212,168,0.18);font-weight:600}
+.nav-item .nav-icon{width:20px;text-align:center;font-size:0.85rem;opacity:0.6}
+.nav-item.active .nav-icon{opacity:1}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.06);font-size:0.68rem;color:rgba(255,255,255,0.4);letter-spacing:0.04em;margin-top:auto}
+.sidebar-footer .domain{color:var(--teal);font-weight:600;letter-spacing:0.06em}
+
+/* ─── Mobile Toggle ─── */
+.mobile-toggle{display:none;position:fixed;top:14px;left:14px;z-index:200;width:42px;height:42px;border-radius:var(--radius-sm);background:rgba(0,0,0,0.4);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;box-shadow:var(--glass-shadow)}
+
+/* ─── Main ─── */
+.main{margin-left:var(--sidebar-w);flex:1;padding:30px 34px;min-height:100vh;max-width:100%;overflow-x:hidden}
+
+/* ─── Cards ─── */
+.card{background:var(--glass-bg);backdrop-filter:blur(var(--glass-blur)) saturate(1.3);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.3);border:1px solid var(--glass-border);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;transition:all var(--transition);box-shadow:var(--glass-shadow)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.1) 50%,transparent 100%)}
+.card:hover{border-color:rgba(255,255,255,0.18);box-shadow:0 8px 40px rgba(0,0,0,0.25)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-family:var(--font);font-size:0.95rem;font-weight:600;color:var(--black);letter-spacing:0}
+.card-badge{font-size:0.6rem;padding:3px 10px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;font-weight:600}
+.badge-teal{background:rgba(45,212,168,0.12);color:var(--teal);border:1px solid rgba(45,212,168,0.25)}
+.badge-amber{background:rgba(240,168,64,0.12);color:var(--amber);border:1px solid rgba(240,168,64,0.2)}
+.badge-red{background:rgba(239,107,107,0.12);color:var(--red-soft);border:1px solid rgba(239,107,107,0.2)}
+.badge-green{background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.2)}
+.badge-blue{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.2)}
+.badge-purple{background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.2)}
+
+/* ─── Tab Panels ─── */
+.tab-panel{display:none;animation:fadeUp 0.4s ease}
+.tab-panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-header{margin-bottom:24px}
+.section-header h2{font-family:var(--font);font-size:1.6rem;font-weight:600;color:var(--white);letter-spacing:-0.01em;text-shadow:0 2px 12px rgba(0,0,0,0.4)}
+.section-header .updated{font-size:0.7rem;color:rgba(255,255,255,0.8);margin-top:4px;letter-spacing:0.02em;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+
+/* ─── Metrics ─── */
+.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+@media(min-width:768px){.metrics-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}}
+.metric-tile{text-align:center;padding:20px 14px}
+.metric-value{font-family:var(--font);font-size:1.4rem;font-weight:600;color:var(--black);letter-spacing:-0.01em;line-height:1}
+@media(min-width:768px){.metric-value{font-size:1.8rem}}
+.metric-value.teal{color:var(--teal)}
+.metric-value.green{color:var(--green)}
+.metric-value.amber{color:var(--amber)}
+.metric-value.blue{color:var(--blue)}
+.metric-value.purple{color:var(--purple)}
+.metric-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin-top:7px;font-weight:500}
+
+/* ─── Grids ─── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.content-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+
+/* ─── Status List ─── */
+.status-list{display:flex;flex-direction:column;gap:8px}
+.status-item{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);transition:all var(--transition)}
+.status-item:hover{background:rgba(255,255,255,0.08)}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.green{background:var(--green);box-shadow:0 0 6px rgba(22,163,74,0.4)}
+.status-dot.amber{background:var(--amber);box-shadow:0 0 6px rgba(217,119,6,0.4)}
+.status-dot.red{background:var(--red-soft);box-shadow:0 0 6px rgba(220,74,74,0.4)}
+.status-dot.teal{background:var(--teal-bright);box-shadow:0 0 6px rgba(16,185,129,0.4)}
+.status-dot.blue{background:var(--blue);box-shadow:0 0 6px rgba(96,165,250,0.4)}
+.status-text{font-size:0.8rem;color:var(--text-secondary);flex:1}
+.status-meta{font-size:0.68rem;color:var(--text-faint);font-weight:500}
+
+/* ─── Finance Rows ─── */
+.finance-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.finance-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.8rem}
+.finance-row:last-child{border-bottom:none}
+.finance-row .label{color:var(--text-muted)}
+.finance-row .value{color:var(--white);font-weight:600}
+.finance-row .value.teal{color:var(--teal)}
+.finance-row .value.red{color:var(--red-soft)}
+.finance-row .value.green{color:var(--green)}
+.finance-row .value.amber{color:var(--amber)}
+
+/* ─── Data Table ─── */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-faint);padding:9px 13px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:600}
+.data-table td{padding:11px 13px;font-size:0.8rem;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text-secondary)}
+.data-table tr:hover td{background:rgba(255,255,255,0.04)}
+
+/* ─── To-Do ─── */
+.todo-input-row{display:flex;gap:8px;margin-bottom:16px}
+.todo-input{flex:1;padding:10px 14px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--white);font-family:var(--font);font-size:0.84rem;outline:none;transition:all var(--transition)}
+.todo-input:focus{border-color:rgba(45,212,168,0.4);background:rgba(255,255,255,0.1)}
+.todo-input::placeholder{color:var(--text-faint)}
+.todo-select{padding:10px 12px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--text-secondary);font-family:var(--font);font-size:0.76rem;outline:none;cursor:pointer;-webkit-appearance:none}
+.todo-select option{background:#1a1a1a;color:#eee}
+.todo-btn{padding:10px 18px;border-radius:var(--radius-sm);background:rgba(45,212,168,0.15);border:1px solid rgba(45,212,168,0.3);color:var(--teal);font-family:var(--font);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all var(--transition);white-space:nowrap}
+.todo-btn:hover{background:rgba(45,212,168,0.25)}
+.todo-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);transition:all var(--transition);margin-bottom:6px}
+.todo-item:hover{background:rgba(255,255,255,0.07)}
+.todo-item.done{opacity:0.45}
+.todo-item.done .todo-label{text-decoration:line-through}
+.todo-check{width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition);flex-shrink:0;font-size:0.65rem;color:transparent}
+.todo-check:hover{border-color:var(--teal)}
+.todo-check.checked{background:rgba(45,212,168,0.2);border-color:var(--teal);color:var(--teal)}
+.todo-label{flex:1;font-size:0.82rem;color:var(--text-secondary)}
+.todo-priority{font-size:0.58rem;padding:2px 8px;border-radius:10px;letter-spacing:0.06em;text-transform:uppercase;font-weight:600}
+.todo-delete{width:24px;height:24px;border:none;background:transparent;color:var(--text-faint);cursor:pointer;font-size:0.75rem;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all var(--transition);opacity:0}
+.todo-item:hover .todo-delete{opacity:1}
+.todo-delete:hover{background:rgba(239,107,107,0.15);color:var(--red-soft)}
+.todo-filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.todo-filter{padding:5px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--text-muted);font-size:0.68rem;font-weight:600;cursor:pointer;transition:all var(--transition);font-family:var(--font)}
+.todo-filter:hover{border-color:rgba(45,212,168,0.3);color:var(--teal)}
+.todo-filter.active{background:var(--teal-glow);color:var(--teal);border-color:rgba(45,212,168,0.25)}
+
+/* ─── Progress Bar ─── */
+.progress-bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.08);overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+.progress-fill.teal{background:var(--teal)}
+.progress-fill.green{background:var(--green)}
+.progress-fill.blue{background:var(--blue)}
+.progress-fill.amber{background:var(--amber)}
+
+/* ─── Goal Card ─── */
+.goal-card{padding:18px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);margin-bottom:10px;transition:all var(--transition)}
+.goal-card:hover{background:rgba(255,255,255,0.08)}
+.goal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.goal-title{font-size:0.9rem;font-weight:500;color:var(--white)}
+.goal-pct{font-size:0.78rem;font-weight:600}
+.goal-detail{font-size:0.72rem;color:var(--text-muted);margin-top:6px}
+
+/* ─── Empty State ─── */
+.empty-state{text-align:center;padding:50px 20px;color:var(--text-muted)}
+.empty-state .icon{font-size:2.2rem;margin-bottom:14px;opacity:0.35}
+.empty-state h3{font-family:var(--font);font-size:1.15rem;color:var(--text);font-weight:400;margin-bottom:6px}
+.empty-state p{font-size:0.78rem;line-height:1.6;max-width:380px;margin:0 auto}
+
+/* ─── Section Divider ─── */
+.section-divider{border:none;border-top:1px solid rgba(255,255,255,0.06);margin:20px 0}
+
+/* ─── Responsive ─── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);width:280px;background:rgba(10,10,10,0.92);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+  .sidebar.open{transform:translateX(0)}
+  .mobile-toggle{display:flex}
+  .main{margin-left:0;padding:16px 14px;padding-top:60px;max-width:100vw;overflow-x:hidden}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .finance-grid{grid-template-columns:1fr}
+  .content-grid{grid-template-columns:1fr}
+  .card{padding:16px;border-radius:12px}
+  .section-header h2{font-size:1.35rem}
+  .data-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+}
+@media(max-width:520px){
+  .main{padding:12px 10px;padding-top:56px}
+  .section-header h2{font-size:1.2rem}
+  .metric-value{font-size:1.25rem}
+  .card{padding:12px;border-radius:10px}
+  .todo-input-row{flex-wrap:wrap}
+  .todo-select{flex:1;min-width:100px}
+}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="app">
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h1>SENTINEL</h1>
+    <div class="subtitle">Personal Operations</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" data-tab="overview"><span class="nav-icon">◉</span> Overview</div>
+    <div class="nav-item" data-tab="health"><span class="nav-icon">♡</span> Health</div>
+    <div class="nav-item" data-tab="goals"><span class="nav-icon">◎</span> Goals</div>
+    <div class="nav-item" data-tab="todo"><span class="nav-icon">☐</span> To Do</div>
+    <div class="nav-item" data-tab="property"><span class="nav-icon">⌂</span> Investment Property</div>
+    <div class="nav-item" data-tab="finance"><span class="nav-icon">$</span> Finance</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="domain">sentinel-hub</div>
+    <div style="margin-top:4px;">Thomas Flood</div>
+  </div>
+</aside>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="main">
+
+<!-- ═══════════ OVERVIEW ═══════════ -->
+<div class="tab-panel active" id="tab-overview">
+  <div class="section-header">
+    <h2>Overview</h2>
+    <div class="updated">Personal command centre — all domains at a glance</div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="card metric-tile">
+      <div class="metric-value teal" id="ov-tasks-done">0</div>
+      <div class="metric-label">Tasks Done Today</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value amber" id="ov-tasks-pending">0</div>
+      <div class="metric-label">Tasks Pending</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value green" id="ov-goals-active">0</div>
+      <div class="metric-label">Active Goals</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value blue" id="ov-streak">—</div>
+      <div class="metric-label">Daily Streak</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Today's Priorities</div>
+        <span class="card-badge badge-teal">Today</span>
+      </div>
+      <div id="ov-today-list" class="status-list">
+        <div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">Add tasks in the To Do tab to see them here</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Goal Progress</div>
+        <span class="card-badge badge-green">Tracking</span>
+      </div>
+      <div id="ov-goals-summary">
+        <div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">Add goals in the Goals tab to track them here</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-header">
+      <div class="card-title">Quick Snapshot</div>
+      <span class="card-badge badge-blue">Live</span>
+    </div>
+    <div class="grid-3" style="gap:20px;">
+      <div>
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);margin-bottom:6px;">Property</div>
+        <div style="font-size:1.1rem;font-weight:600;color:var(--teal);">$750<span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;">/wk</span></div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">Rental income</div>
+      </div>
+      <div>
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);margin-bottom:6px;">Health</div>
+        <div style="font-size:1.1rem;font-weight:600;color:var(--green);" id="ov-health-status">Set up</div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">Log in Health tab</div>
+      </div>
+      <div>
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);margin-bottom:6px;">Next Trip</div>
+        <div style="font-size:1.1rem;font-weight:600;color:var(--purple);" id="ov-trip-countdown">—</div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">Italy · May 13–29</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ HEALTH ═══════════ -->
+<div class="tab-panel" id="tab-health">
+  <div class="section-header">
+    <h2>Health</h2>
+    <div class="updated">Track workouts, weight, sleep & habits</div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="card metric-tile">
+      <div class="metric-value green" id="h-workouts-week">0</div>
+      <div class="metric-label">Workouts This Week</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value blue" id="h-current-weight">—</div>
+      <div class="metric-label">Current Weight (kg)</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value purple" id="h-sleep-avg">—</div>
+      <div class="metric-label">Avg Sleep (hrs)</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value teal" id="h-water-today">0</div>
+      <div class="metric-label">Water Today (L)</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Log Workout</div>
+        <span class="card-badge badge-green">Add</span>
+      </div>
+      <div class="todo-input-row" style="flex-wrap:wrap;">
+        <select class="todo-select" id="h-workout-type" style="flex:1;min-width:120px;">
+          <option value="gym">Gym</option>
+          <option value="run">Run</option>
+          <option value="surf">Surf</option>
+          <option value="walk">Walk</option>
+          <option value="swim">Swim</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="number" class="todo-input" id="h-workout-duration" placeholder="Minutes" style="max-width:100px;">
+        <input type="text" class="todo-input" id="h-workout-notes" placeholder="Notes (optional)" style="flex:2;min-width:140px;">
+        <button class="todo-btn" onclick="addWorkout()">Log</button>
+      </div>
+      <div id="h-workout-log" class="status-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Daily Log</div>
+        <span class="card-badge badge-blue">Today</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);display:block;margin-bottom:5px;">Weight (kg)</label>
+          <div class="todo-input-row" style="margin-bottom:0">
+            <input type="number" step="0.1" class="todo-input" id="h-weight-input" placeholder="e.g. 82.5">
+            <button class="todo-btn" onclick="logWeight()">Save</button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);display:block;margin-bottom:5px;">Sleep (hrs)</label>
+          <div class="todo-input-row" style="margin-bottom:0">
+            <input type="number" step="0.5" class="todo-input" id="h-sleep-input" placeholder="e.g. 7.5">
+            <button class="todo-btn" onclick="logSleep()">Save</button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);display:block;margin-bottom:5px;">Water Intake</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="todo-btn" onclick="addWater(0.25)">+250ml</button>
+            <button class="todo-btn" onclick="addWater(0.5)">+500ml</button>
+            <button class="todo-btn" onclick="addWater(1)">+1L</button>
+            <button class="todo-btn" onclick="resetWater()" style="background:rgba(239,107,107,0.1);border-color:rgba(239,107,107,0.2);color:var(--red-soft);">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-header">
+      <div class="card-title">Weight History</div>
+      <span class="card-badge badge-purple">Trend</span>
+    </div>
+    <div id="h-weight-history" class="status-list">
+      <div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">Log your weight above to start tracking</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ GOALS ═══════════ -->
+<div class="tab-panel" id="tab-goals">
+  <div class="section-header">
+    <h2>Goals</h2>
+    <div class="updated">Define targets, track milestones</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-title">Add New Goal</div>
+      <span class="card-badge badge-teal">Create</span>
+    </div>
+    <div class="todo-input-row" style="flex-wrap:wrap;">
+      <input type="text" class="todo-input" id="g-title" placeholder="Goal title" style="flex:2;min-width:180px;">
+      <input type="number" class="todo-input" id="g-target" placeholder="Target" style="max-width:90px;">
+      <input type="text" class="todo-input" id="g-unit" placeholder="Unit" style="max-width:90px;">
+      <select class="todo-select" id="g-category" style="min-width:110px;">
+        <option value="personal">Personal</option>
+        <option value="fitness">Fitness</option>
+        <option value="finance">Finance</option>
+        <option value="business">Business</option>
+        <option value="spiritual">Spiritual</option>
+      </select>
+      <button class="todo-btn" onclick="addGoal()">Add Goal</button>
+    </div>
+  </div>
+
+  <div id="g-goals-list"></div>
+
+  <div id="g-empty" class="card">
+    <div class="empty-state">
+      <div class="icon">◎</div>
+      <h3>No goals yet</h3>
+      <p>Set a target above — fitness, finance, personal growth — and track your progress here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TO DO ═══════════ -->
+<div class="tab-panel" id="tab-todo">
+  <div class="section-header">
+    <h2>To Do</h2>
+    <div class="updated">Personal task list — not work, just life</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="todo-input-row">
+      <input type="text" class="todo-input" id="td-input" placeholder="What needs doing?" onkeydown="if(event.key==='Enter')addTodo()">
+      <select class="todo-select" id="td-priority">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+        <option value="urgent">Urgent</option>
+      </select>
+      <select class="todo-select" id="td-category">
+        <option value="personal">Personal</option>
+        <option value="home">Home</option>
+        <option value="finance">Finance</option>
+        <option value="health">Health</option>
+        <option value="admin">Admin</option>
+        <option value="travel">Travel</option>
+      </select>
+      <button class="todo-btn" onclick="addTodo()">Add</button>
+    </div>
+    <div class="todo-filters">
+      <button class="todo-filter active" data-filter="all" onclick="filterTodos('all',this)">All</button>
+      <button class="todo-filter" data-filter="active" onclick="filterTodos('active',this)">Active</button>
+      <button class="todo-filter" data-filter="done" onclick="filterTodos('done',this)">Done</button>
+      <button class="todo-filter" data-filter="high" onclick="filterTodos('high',this)">High+</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Tasks</div>
+      <span class="card-badge badge-teal" id="td-count">0 items</span>
+    </div>
+    <div id="td-list"></div>
+    <div id="td-empty" class="empty-state" style="padding:30px 20px;">
+      <div class="icon">☐</div>
+      <h3>All clear</h3>
+      <p>Add a task above to get started.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ INVESTMENT PROPERTY ═══════════ -->
+<div class="tab-panel" id="tab-property">
+  <div class="section-header">
+    <h2>Investment Property</h2>
+    <div class="updated">Unit 33/286 The Esplanade, Miami QLD 4220</div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="card metric-tile">
+      <div class="metric-value teal">$750</div>
+      <div class="metric-label">Weekly Rent</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value green">$39,000</div>
+      <div class="metric-label">Annual Income</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value amber">7%</div>
+      <div class="metric-label">Mgmt Fee</div>
+    </div>
+    <div class="card metric-tile">
+      <div class="metric-value blue">$36,270</div>
+      <div class="metric-label">Net Annual</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Property Details</div>
+        <span class="card-badge badge-teal">Active</span>
+      </div>
+      <div class="finance-row"><span class="label">Address</span><span class="value" style="font-size:0.75rem;">33/286 The Esplanade, Miami</span></div>
+      <div class="finance-row"><span class="label">Scheme</span><span class="value">Silver Lining CTS 14566</span></div>
+      <div class="finance-row"><span class="label">Manager</span><span class="value">PRD Burleigh Heads</span></div>
+      <div class="finance-row"><span class="label">Tenant Rent</span><span class="value teal">$750/wk</span></div>
+      <div class="finance-row"><span class="label">Management Fee</span><span class="value">7%</span></div>
+      <div class="finance-row"><span class="label">Strategy</span><span class="value" style="font-size:0.75rem;">Negative gearing offset</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Income Breakdown</div>
+        <span class="card-badge badge-green">Annual</span>
+      </div>
+      <div class="finance-row"><span class="label">Gross Rent</span><span class="value green">$39,000</span></div>
+      <div class="finance-row"><span class="label">Management Fee (7%)</span><span class="value red">-$2,730</span></div>
+      <div class="finance-row"><span class="label">Net Rental Income</span><span class="value teal">$36,270</span></div>
+      <hr class="section-divider" style="margin:8px 0;">
+      <div class="finance-row"><span class="label">Monthly Net</span><span class="value">$3,022.50</span></div>
+      <div class="finance-row"><span class="label">Weekly Net</span><span class="value">$697.50</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-header">
+      <div class="card-title">Expense Log</div>
+      <span class="card-badge badge-amber">Track</span>
+    </div>
+    <div class="todo-input-row" style="flex-wrap:wrap;">
+      <input type="text" class="todo-input" id="p-expense-desc" placeholder="Expense description" style="flex:2;min-width:160px;">
+      <input type="number" step="0.01" class="todo-input" id="p-expense-amt" placeholder="Amount $" style="max-width:110px;">
+      <input type="date" class="todo-input" id="p-expense-date" style="max-width:150px;">
+      <button class="todo-btn" onclick="addPropertyExpense()">Add</button>
+    </div>
+    <div id="p-expenses-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════ FINANCE ═══════════ -->
+<div class="tab-panel" id="tab-finance">
+  <div class="section-header">
+    <h2>Finance</h2>
+    <div class="updated">Income, subscriptions & cash flow overview</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Income Streams</div>
+        <span class="card-badge badge-green">Monthly</span>
+      </div>
+      <div class="finance-row"><span class="label">Vicom Salary</span><span class="value green">—</span></div>
+      <div class="finance-row"><span class="label">Rental Income (net)</span><span class="value green">$3,023</span></div>
+      <div class="finance-row"><span class="label">Rankify Clients</span><span class="value green">—</span></div>
+      <div class="finance-row"><span class="label">Hiatus Sales</span><span class="value green">—</span></div>
+      <hr class="section-divider" style="margin:8px 0;">
+      <div class="finance-row"><span class="label" style="font-weight:600;">Total Monthly</span><span class="value teal" id="f-total-income">—</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Active Subscriptions</div>
+        <span class="card-badge badge-amber">Recurring</span>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Service</th><th>Cost</th><th>Billed To</th></tr></thead>
+        <tbody>
+          <tr><td>Claude.ai</td><td style="color:var(--amber)">—</td><td style="font-size:0.7rem;">Vicom reimburse</td></tr>
+          <tr><td>Buffer</td><td style="color:var(--amber)">—</td><td style="font-size:0.7rem;">Vicom reimburse</td></tr>
+          <tr><td>Smartlead</td><td style="color:var(--amber)">$39/mo</td><td style="font-size:0.7rem;">Rankify</td></tr>
+          <tr><td>Shopify</td><td style="color:var(--amber)">—</td><td style="font-size:0.7rem;">Hiatus</td></tr>
+          <tr><td>Semrush</td><td style="color:var(--red-soft)">Review</td><td style="font-size:0.7rem;">Axe if no clients</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-header">
+      <div class="card-title">Expense Tracker</div>
+      <span class="card-badge badge-red">Monthly</span>
+    </div>
+    <div class="todo-input-row" style="flex-wrap:wrap;">
+      <input type="text" class="todo-input" id="f-exp-desc" placeholder="Expense" style="flex:2;min-width:160px;">
+      <input type="number" step="0.01" class="todo-input" id="f-exp-amt" placeholder="$" style="max-width:100px;">
+      <select class="todo-select" id="f-exp-cat" style="min-width:110px;">
+        <option value="personal">Personal</option>
+        <option value="business">Business</option>
+        <option value="property">Property</option>
+        <option value="subscriptions">Subscriptions</option>
+        <option value="food">Food</option>
+        <option value="transport">Transport</option>
+        <option value="other">Other</option>
+      </select>
+      <button class="todo-btn" onclick="addExpense()">Add</button>
+    </div>
+    <div id="f-expense-list"></div>
+    <div style="margin-top:12px;display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(255,255,255,0.06);">
+      <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">Total Expenses</span>
+      <span style="font-size:0.95rem;font-weight:700;color:var(--red-soft);" id="f-total-expenses">$0</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- .main -->
+</div><!-- .app -->
+
+<script>
+// ─── STATE (localStorage persistence) ───
+const STATE_KEY = 'sentinel_hub_state';
+let state = loadState();
+
+function defaultState() {
+  return {
+    todos: [],
+    goals: [],
+    workouts: [],
+    weightLog: [],
+    sleepLog: [],
+    waterToday: 0,
+    waterDate: today(),
+    propertyExpenses: [],
+    expenses: [],
+    dailyStreak: 0,
+    lastStreakDate: null
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      return { ...defaultState(), ...s };
+    }
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem(STATE_KEY, JSON.stringify(state));
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+}
+
+// ─── NAVIGATION ───
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('tab-' + item.dataset.tab).classList.add('active');
+    document.querySelector('.sidebar').classList.remove('open');
+    updateOverview();
+  });
+});
+
+// ─── TO DO ───
+let todoFilter = 'all';
+
+function addTodo() {
+  const input = document.getElementById('td-input');
+  const text = input.value.trim();
+  if (!text) return;
+  state.todos.push({
+    id: uid(),
+    text,
+    priority: document.getElementById('td-priority').value,
+    category: document.getElementById('td-category').value,
+    done: false,
+    created: today()
+  });
+  input.value = '';
+  saveState();
+  renderTodos();
+}
+
+function toggleTodo(id) {
+  const t = state.todos.find(x => x.id === id);
+  if (t) t.done = !t.done;
+  saveState();
+  renderTodos();
+}
+
+function deleteTodo(id) {
+  state.todos = state.todos.filter(x => x.id !== id);
+  saveState();
+  renderTodos();
+}
+
+function filterTodos(f, btn) {
+  todoFilter = f;
+  document.querySelectorAll('.todo-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTodos();
+}
+
+function renderTodos() {
+  let list = state.todos;
+  if (todoFilter === 'active') list = list.filter(x => !x.done);
+  else if (todoFilter === 'done') list = list.filter(x => x.done);
+  else if (todoFilter === 'high') list = list.filter(x => x.priority === 'high' || x.priority === 'urgent');
+
+  const container = document.getElementById('td-list');
+  const empty = document.getElementById('td-empty');
+  const priorityColors = { low: 'badge-blue', medium: 'badge-teal', high: 'badge-amber', urgent: 'badge-red' };
+
+  if (list.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    // Sort: undone first, then by priority
+    const pOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+    list.sort((a, b) => (a.done - b.done) || (pOrder[a.priority] - pOrder[b.priority]));
+    container.innerHTML = list.map(t => `
+      <div class="todo-item ${t.done ? 'done' : ''}">
+        <div class="todo-check ${t.done ? 'checked' : ''}" onclick="toggleTodo('${t.id}')">✓</div>
+        <span class="todo-label">${esc(t.text)}</span>
+        <span class="todo-priority ${priorityColors[t.priority]}" style="background:inherit;">${t.priority}</span>
+        <button class="todo-delete" onclick="deleteTodo('${t.id}')">✕</button>
+      </div>
+    `).join('');
+  }
+  const active = state.todos.filter(x => !x.done).length;
+  const done = state.todos.filter(x => x.done).length;
+  document.getElementById('td-count').textContent = `${active} active · ${done} done`;
+  updateOverview();
+}
+
+// ─── GOALS ───
+function addGoal() {
+  const title = document.getElementById('g-title').value.trim();
+  const target = parseFloat(document.getElementById('g-target').value);
+  const unit = document.getElementById('g-unit').value.trim();
+  const category = document.getElementById('g-category').value;
+  if (!title || !target) return;
+  state.goals.push({ id: uid(), title, target, current: 0, unit, category, created: today() });
+  document.getElementById('g-title').value = '';
+  document.getElementById('g-target').value = '';
+  document.getElementById('g-unit').value = '';
+  saveState();
+  renderGoals();
+}
+
+function updateGoalProgress(id, delta) {
+  const g = state.goals.find(x => x.id === id);
+  if (g) {
+    g.current = Math.max(0, Math.min(g.target, g.current + delta));
+    saveState();
+    renderGoals();
+  }
+}
+
+function deleteGoal(id) {
+  state.goals = state.goals.filter(x => x.id !== id);
+  saveState();
+  renderGoals();
+}
+
+function renderGoals() {
+  const container = document.getElementById('g-goals-list');
+  const empty = document.getElementById('g-empty');
+  const catColors = { personal: 'teal', fitness: 'green', finance: 'amber', business: 'blue', spiritual: 'purple' };
+
+  if (state.goals.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    container.innerHTML = state.goals.map(g => {
+      const pct = Math.round((g.current / g.target) * 100);
+      const color = catColors[g.category] || 'teal';
+      return `
+        <div class="card goal-card" style="margin-bottom:10px;">
+          <div class="goal-header">
+            <div class="goal-title">${esc(g.title)}</div>
+            <div class="goal-pct" style="color:var(--${color});">${pct}%</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill ${color}" style="width:${pct}%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+            <div class="goal-detail">${g.current} / ${g.target} ${esc(g.unit)} · ${g.category}</div>
+            <div style="display:flex;gap:4px;">
+              <button class="todo-btn" style="padding:4px 10px;font-size:0.7rem;" onclick="updateGoalProgress('${g.id}',-1)">−</button>
+              <button class="todo-btn" style="padding:4px 10px;font-size:0.7rem;" onclick="updateGoalProgress('${g.id}',1)">+</button>
+              <button class="todo-delete" style="opacity:1;width:28px;height:28px;" onclick="deleteGoal('${g.id}')">✕</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  updateOverview();
+}
+
+// ─── HEALTH ───
+function addWorkout() {
+  const type = document.getElementById('h-workout-type').value;
+  const duration = parseInt(document.getElementById('h-workout-duration').value) || 0;
+  const notes = document.getElementById('h-workout-notes').value.trim();
+  if (!duration) return;
+  state.workouts.push({ id: uid(), type, duration, notes, date: today() });
+  document.getElementById('h-workout-duration').value = '';
+  document.getElementById('h-workout-notes').value = '';
+  saveState();
+  renderHealth();
+}
+
+function logWeight() {
+  const val = parseFloat(document.getElementById('h-weight-input').value);
+  if (!val) return;
+  state.weightLog.push({ date: today(), value: val });
+  document.getElementById('h-weight-input').value = '';
+  saveState();
+  renderHealth();
+}
+
+function logSleep() {
+  const val = parseFloat(document.getElementById('h-sleep-input').value);
+  if (!val) return;
+  state.sleepLog.push({ date: today(), value: val });
+  document.getElementById('h-sleep-input').value = '';
+  saveState();
+  renderHealth();
+}
+
+function addWater(amt) {
+  if (state.waterDate !== today()) { state.waterToday = 0; state.waterDate = today(); }
+  state.waterToday = Math.round((state.waterToday + amt) * 100) / 100;
+  saveState();
+  renderHealth();
+}
+
+function resetWater() {
+  state.waterToday = 0;
+  state.waterDate = today();
+  saveState();
+  renderHealth();
+}
+
+function renderHealth() {
+  if (state.waterDate !== today()) { state.waterToday = 0; state.waterDate = today(); }
+
+  // Workouts this week
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekStr = weekAgo.toISOString().split('T')[0];
+  const weekWorkouts = state.workouts.filter(w => w.date >= weekStr);
+  document.getElementById('h-workouts-week').textContent = weekWorkouts.length;
+
+  // Current weight
+  const lastWeight = state.weightLog.length ? state.weightLog[state.weightLog.length - 1].value : null;
+  document.getElementById('h-current-weight').textContent = lastWeight ? lastWeight.toFixed(1) : '—';
+
+  // Avg sleep (last 7)
+  const recentSleep = state.sleepLog.slice(-7);
+  const avgSleep = recentSleep.length ? (recentSleep.reduce((s, x) => s + x.value, 0) / recentSleep.length).toFixed(1) : '—';
+  document.getElementById('h-sleep-avg').textContent = avgSleep;
+
+  // Water
+  document.getElementById('h-water-today').textContent = state.waterToday.toFixed(1);
+
+  // Workout log (last 10)
+  const recent = state.workouts.slice(-10).reverse();
+  const wl = document.getElementById('h-workout-log');
+  if (recent.length === 0) {
+    wl.innerHTML = '<div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">No workouts logged yet</div>';
+  } else {
+    const icons = { gym: '🏋️', run: '🏃', surf: '🏄', walk: '🚶', swim: '🏊', other: '⚡' };
+    wl.innerHTML = recent.map(w => `
+      <div class="status-item">
+        <span style="font-size:1rem;">${icons[w.type] || '⚡'}</span>
+        <span class="status-text"><strong>${w.type}</strong> · ${w.duration} min${w.notes ? ' · ' + esc(w.notes) : ''}</span>
+        <span class="status-meta">${w.date}</span>
+      </div>
+    `).join('');
+  }
+
+  // Weight history (last 10)
+  const wh = document.getElementById('h-weight-history');
+  const recentW = state.weightLog.slice(-10).reverse();
+  if (recentW.length === 0) {
+    wh.innerHTML = '<div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">Log your weight above to start tracking</div>';
+  } else {
+    wh.innerHTML = recentW.map((w, i) => {
+      const prev = recentW[i + 1];
+      let delta = '';
+      if (prev) {
+        const d = w.value - prev.value;
+        delta = d > 0 ? `<span style="color:var(--red-soft)">+${d.toFixed(1)}</span>` : d < 0 ? `<span style="color:var(--green)">${d.toFixed(1)}</span>` : '—';
+      }
+      return `
+        <div class="status-item">
+          <div class="status-dot ${i === 0 ? 'teal' : 'blue'}"></div>
+          <span class="status-text">${w.value.toFixed(1)} kg ${delta}</span>
+          <span class="status-meta">${w.date}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  updateOverview();
+}
+
+// ─── PROPERTY EXPENSES ───
+function addPropertyExpense() {
+  const desc = document.getElementById('p-expense-desc').value.trim();
+  const amt = parseFloat(document.getElementById('p-expense-amt').value);
+  const date = document.getElementById('p-expense-date').value || today();
+  if (!desc || !amt) return;
+  state.propertyExpenses.push({ id: uid(), desc, amt, date });
+  document.getElementById('p-expense-desc').value = '';
+  document.getElementById('p-expense-amt').value = '';
+  saveState();
+  renderPropertyExpenses();
+}
+
+function renderPropertyExpenses() {
+  const container = document.getElementById('p-expenses-list');
+  const sorted = [...state.propertyExpenses].sort((a, b) => b.date.localeCompare(a.date));
+  if (sorted.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">No property expenses logged</div>';
+  } else {
+    container.innerHTML = sorted.map(e => `
+      <div class="status-item">
+        <div class="status-dot amber"></div>
+        <span class="status-text">${esc(e.desc)}</span>
+        <span class="status-meta" style="color:var(--amber);">$${e.amt.toFixed(2)}</span>
+        <span class="status-meta">${e.date}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// ─── GENERAL EXPENSES ───
+function addExpense() {
+  const desc = document.getElementById('f-exp-desc').value.trim();
+  const amt = parseFloat(document.getElementById('f-exp-amt').value);
+  const cat = document.getElementById('f-exp-cat').value;
+  if (!desc || !amt) return;
+  state.expenses.push({ id: uid(), desc, amt, cat, date: today() });
+  document.getElementById('f-exp-desc').value = '';
+  document.getElementById('f-exp-amt').value = '';
+  saveState();
+  renderExpenses();
+}
+
+function renderExpenses() {
+  const container = document.getElementById('f-expense-list');
+  const thisMonth = today().substring(0, 7);
+  const monthly = state.expenses.filter(e => e.date.startsWith(thisMonth));
+  const total = monthly.reduce((s, e) => s + e.amt, 0);
+  document.getElementById('f-total-expenses').textContent = '$' + total.toFixed(2);
+
+  const sorted = [...monthly].sort((a, b) => b.date.localeCompare(a.date));
+  if (sorted.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">No expenses this month</div>';
+  } else {
+    container.innerHTML = sorted.map(e => `
+      <div class="status-item">
+        <div class="status-dot red"></div>
+        <span class="status-text">${esc(e.desc)} <span style="color:var(--text-faint);font-size:0.68rem;">${e.cat}</span></span>
+        <span class="status-meta" style="color:var(--red-soft);">$${e.amt.toFixed(2)}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// ─── OVERVIEW ───
+function updateOverview() {
+  // Tasks
+  const todayTodos = state.todos;
+  const done = todayTodos.filter(x => x.done).length;
+  const pending = todayTodos.filter(x => !x.done).length;
+  document.getElementById('ov-tasks-done').textContent = done;
+  document.getElementById('ov-tasks-pending').textContent = pending;
+
+  // Goals
+  document.getElementById('ov-goals-active').textContent = state.goals.length;
+
+  // Today's priorities
+  const topTasks = state.todos.filter(x => !x.done).slice(0, 5);
+  const ovList = document.getElementById('ov-today-list');
+  if (topTasks.length) {
+    const pColors = { urgent: 'red', high: 'amber', medium: 'teal', low: 'blue' };
+    ovList.innerHTML = topTasks.map(t => `
+      <div class="status-item">
+        <div class="status-dot ${pColors[t.priority] || 'teal'}"></div>
+        <span class="status-text">${esc(t.text)}</span>
+        <span class="status-meta">${t.priority}</span>
+      </div>
+    `).join('');
+  } else {
+    ovList.innerHTML = '<div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">No pending tasks</div>';
+  }
+
+  // Goal summary
+  const ovGoals = document.getElementById('ov-goals-summary');
+  if (state.goals.length) {
+    ovGoals.innerHTML = state.goals.slice(0, 4).map(g => {
+      const pct = Math.round((g.current / g.target) * 100);
+      return `
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+            <span style="color:var(--text-secondary);">${esc(g.title)}</span>
+            <span style="color:var(--teal);font-weight:600;">${pct}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill teal" style="width:${pct}%"></div></div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    ovGoals.innerHTML = '<div style="color:var(--text-faint);font-size:0.8rem;padding:10px;">Add goals to track them here</div>';
+  }
+
+  // Health status
+  const lastW = state.weightLog.length ? state.weightLog[state.weightLog.length - 1].value + 'kg' : 'Set up';
+  document.getElementById('ov-health-status').textContent = lastW;
+
+  // Trip countdown
+  const tripDate = new Date('2026-05-13');
+  const nowDate = new Date();
+  const diffDays = Math.ceil((tripDate - nowDate) / (1000 * 60 * 60 * 24));
+  if (diffDays > 0) {
+    document.getElementById('ov-trip-countdown').textContent = diffDays + 'd';
+  } else if (diffDays >= -16) {
+    document.getElementById('ov-trip-countdown').textContent = '🇮🇹 Now!';
+  } else {
+    document.getElementById('ov-trip-countdown').textContent = 'Done';
+  }
+
+  // Streak
+  document.getElementById('ov-streak').textContent = state.dailyStreak || '—';
+}
+
+// ─── UTILITY ───
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ─── INIT ───
+renderTodos();
+renderGoals();
+renderHealth();
+renderPropertyExpenses();
+renderExpenses();
+updateOverview();
+</script>
+</body>
+</html>
